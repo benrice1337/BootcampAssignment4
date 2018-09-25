@@ -10,17 +10,30 @@ angular.module('listings').controller('ListingsController', ['$scope', 'Listings
     $scope.detailedInfo = undefined;
 
     $scope.addListing = function() {
-	  /**TODO 
-	  *Save the article using the Listings factory. If the object is successfully 
-	  saved redirect back to the list page. Otherwise, display the error
-	 */
+      var newEntry = {
+        "code": $scope.newListing.code,
+        "name": $scope.newListing.name,
+        "address": $scope.newListing.address
+      };
+      Listings.create(newEntry, function(err) {
+        if (err) throw err;
+      });
+      Listings.getAll().then(function(response) {
+        $scope.listings = response.data;
+      }, function(error) {
+        console.log('Unable to retrieve listings:', error);
+      });
     };
 
-    $scope.deleteListing = function(index) {
-	   /**TODO
-        Delete the article using the Listings factory. If the removal is successful, 
-		navigate back to 'listing.list'. Otherwise, display the error. 
-       */
+    $scope.deleteListing = function(id) {
+      Listings.delete(id, function(err) {
+        if (err) throw err;
+      });
+      Listings.getAll().then(function(response) {
+        $scope.listings = response.data;
+      }, function(error) {
+        console.log('Unable to retrieve listings:', error);
+      });
     };
 
     $scope.showDetails = function(index) {

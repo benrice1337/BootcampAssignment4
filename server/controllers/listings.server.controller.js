@@ -39,24 +39,60 @@ exports.read = function(req, res) {
 /* Update a listing */
 exports.update = function(req, res) {
   var listing = req.listing;
+  listing.name = req.body.name;
+  listing.code = req.body.code;
+  listing.address = req.body.address;
+  if (req.body.lng && req.body.lat) {
+    listing.longitude = req.body.lng;
+    listing.latitude = req.body.lat;
+  }
 
-  /** TODO **/
-  /* Replace the article's properties with the new properties found in req.body */
-  /* Save the article */
+  listing.save(function(err) {
+    if(err) {
+      console.log(err);
+      res.status(400).send(err);
+    } else {
+      res.json(listing);
+    }
+  });
 };
 
 /* Delete a listing */
 exports.delete = function(req, res) {
   var listing = req.listing;
-
-  /** TODO **/
-  /* Remove the article */
+  Listing.findOneAndRemove({code: listing.code}, function(err, docs) {
+    if (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+    res.status(200).send(docs);
+  });
+  /*
+  listing.remove(function(err) {
+    if (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  });
+  */
 };
 
 /* Retreive all the directory listings, sorted alphabetically by listing code */
 exports.list = function(req, res) {
-  /** TODO **/
-  /* Your code here */
+  Listing.find({}, function(err, docs) {
+    if (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+    docs.sort(function(a, b) {
+      var x = a.code.toLowerCase();
+      var y = b.code.toLowerCase();
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0;
+    });
+    res.status(200).send(docs);
+  });
 };
 
 /* 
